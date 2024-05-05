@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: cdr-generator-service
+  datasource:
+    # url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?useSSL=false
+    url: jdbc:postgresql://localhost:5432/baby_billing_cdr?useSSL=false
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    producer:
+      # bootstrap-servers: kafka:29092
+      bootstrap-servers: localhost:29092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+kafka:
+  topics:
+    cdr: cdr-topic
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      # default-zone: http://eureka-server:8761/eureka/
+      default-zone: http://localhost:8761/eureka/

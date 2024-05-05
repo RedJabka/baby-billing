@@ -1,0 +1,89 @@
+version: '3.9'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  eureka-server:
+    container_name: eureka-server
+    build: ./main/eureka-server
+    ports:
+      - "8761:8761"
+
+  postgres-cdr:
+    container_name: postgres-cdr
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_HOST: postgres-cdr
+      POSTGRES_DB: baby_billing_cdr
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+    ports:
+      - "5432:5432"   
+
+  postgres-brt:
+    container_name: postgres-brt
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_HOST: postgres-brt
+      POSTGRES_DB: baby_billing_brt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5433
+    ports:
+      - "5433:5432"
+
+  cdr-generator-service:
+    build: ./main/cdr-generator-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres-cdr:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  brt-service:
+    build: ./main/brt-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres-brt:
+        condition: service_healthy
+      kafka:
+        condition: service_started
