@@ -2,8 +2,7 @@ spring:
   application:
     name: cdr-generator-service
   datasource:
-    # url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?useSSL=false
-    url: jdbc:postgresql://localhost:5432/baby_billing_cdr?useSSL=false
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/baby_billing_cdr?useSSL=false}
     driver-class-name: org.postgresql.Driver
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
@@ -11,8 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     producer:
-      # bootstrap-servers: kafka:29092
-      bootstrap-servers: localhost:29092
+      bootstrap-servers: ${KAFKA_HOST:localhost}:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
   liquibase:
@@ -24,10 +22,4 @@ kafka:
     cdr: cdr-topic
 
 server:
-  port: 0
-
-eureka:
-  client:
-    service-url:
-      # default-zone: http://eureka-server:8761/eureka/
-      default-zone: http://localhost:8761/eureka/
+  port: 8081

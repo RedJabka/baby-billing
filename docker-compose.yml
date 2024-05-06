@@ -22,7 +22,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
@@ -84,6 +84,7 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres-cdr:5432/baby_billing_cdr?useSSL=false
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      KAFKA_HOST: broker
     ports:
       - "8081:8081"
     depends_on:
@@ -102,7 +103,9 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres-brt:5432/baby_billing_brt?useSSL=false
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
+      EUREKA_HOST: eureka-server
+      # eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
+      KAFKA_HOST: broker
     ports:
       - "8082:8082"
     depends_on:
