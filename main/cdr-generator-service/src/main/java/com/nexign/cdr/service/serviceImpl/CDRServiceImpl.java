@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.Year;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.nexign.cdr.entity.Subscriber;
@@ -45,11 +42,13 @@ public class CDRServiceImpl implements CDRService {
     private final SubscriberRepository subscriberRepository;
 
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
-    
+
     @Value("${kafka.topics.cdr}")
     private final String KAFKA_TOPIC;
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final int numTreads = 10;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(numTreads);
 
     private final Random random = new Random();
 
@@ -67,9 +66,9 @@ public class CDRServiceImpl implements CDRService {
 
     @Autowired
     public CDRServiceImpl(CDRRepositoryDB cdrRepositoryDB,
-                          CDRRepositoryFile cdrRepositoryFile,
-                          SubscriberRepository subscriberRepository,
-                          KafkaTemplate<String, byte[]> kafkaTemplate) {
+            CDRRepositoryFile cdrRepositoryFile,
+            SubscriberRepository subscriberRepository,
+            KafkaTemplate<String, byte[]> kafkaTemplate) {
         this.cdrRepositoryDB = cdrRepositoryDB;
         this.cdrRepositoryFile = cdrRepositoryFile;
         this.subscriberRepository = subscriberRepository;
@@ -98,47 +97,51 @@ public class CDRServiceImpl implements CDRService {
 
         System.out.println("Generating CDR...");
 
-        while (leftBound.get() < rightBound) {
+        for (int index = 0; index < numTreads; index++) {
             executorService.submit(() -> {
-                long currentLeftBound =  leftBound.getAndAdd(random.nextInt(maxCallDelta));
+                while (leftBound.get() < rightBound) {
+                    long currentLeftBound = leftBound.getAndAdd(random.nextInt(maxCallDelta));
 
-                int firstSubscriberId = random.nextInt(subscribersSize);
-                int secondSubscriberId;
-                do {
-                    secondSubscriberId = random.nextInt(subscribersSize);
-                } while (firstSubscriberId == secondSubscriberId);
+                    int firstSubscriberId = random.nextInt(subscribersSize);
+                    int secondSubscriberId;
+                    do {
+                        secondSubscriberId = random.nextInt(subscribersSize);
+                    } while (firstSubscriberId == secondSubscriberId);
 
-                Subscriber firstSubscriber = subscribers.get(firstSubscriberId);
-                Subscriber secondSubscriber = subscribers.get(secondSubscriberId);
+                    Subscriber firstSubscriber = subscribers.get(firstSubscriberId);
+                    Subscriber secondSubscriber = subscribers.get(secondSubscriberId);
 
-                LocalDateTime startTime = currentYear.plusSeconds(currentLeftBound);
-                LocalDateTime endTime = startTime.plusSeconds(random.nextInt(maxCallTime));
+                    LocalDateTime startTime = currentYear.plusSeconds(currentLeftBound);
+                    LocalDateTime endTime = startTime.plusSeconds(random.nextInt(maxCallTime));
 
-                CDR cdr1 = CDR.builder()
-                        .callType(CallType.getByCode("01"))
-                        .subscriberServed(firstSubscriber)
-                        .subscriberConnected(secondSubscriber)
-                        .startTime(startTime)
-                        .endTime(endTime)
-                        .build();
+                    CDR cdr1 = CDR.builder()
+                            .callType(CallType.getByCode("01"))
+                            .subscriberServed(firstSubscriber)
+                            .subscriberConnected(secondSubscriber)
+                            .startTime(startTime)
+                            .endTime(endTime)
+                            .build();
 
-                CDR cdr2 = CDR.builder()
-                        .callType(CallType.getByCode("02"))
-                        .subscriberServed(secondSubscriber)
-                        .subscriberConnected(firstSubscriber)
-                        .startTime(startTime)
-                        .endTime(endTime)
-                        .build();
+                    CDR cdr2 = CDR.builder()
+                            .callType(CallType.getByCode("02"))
+                            .subscriberServed(secondSubscriber)
+                            .subscriberConnected(firstSubscriber)
+                            .startTime(startTime)
+                            .endTime(endTime)
+                            .build();
 
-                try {
-                    queue.put(cdr1);
-                    queue.put(cdr2);
+                    try {
+                        queue.put(cdr1);
+                        queue.put(cdr2);
 
-                    if (queue.size() >= recordsInFile) {
-                        saveCDR(queue);
+                        synchronized (queue) {
+                            if (queue.size() >= recordsInFile) {
+                                saveCDR(queue);
+                            }
+                        }
+                    } catch (InterruptedException | IOException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (InterruptedException | IOException e) {
-                    throw new RuntimeException(e);
                 }
             });
         }
@@ -163,11 +166,11 @@ public class CDRServiceImpl implements CDRService {
         System.out.println("CDR generation finished");
     }
 
-
     public void saveCDR(BlockingQueue<CDR> queue) throws IOException {
         List<CDR> queueList = new ArrayList<>(recordsInFile);
         queue.drainTo(queueList, recordsInFile);
-        File file =cdrRepositoryFile.saveToFile(queueList);
+        File file = cdrRepositoryFile.saveToFile(queueList);
+        cdrRepositoryDB.saveAll(queueList);
         byte[] fileData = Files.readAllBytes(file.toPath());
         kafkaTemplate.send(KAFKA_TOPIC, fileData);
     }
