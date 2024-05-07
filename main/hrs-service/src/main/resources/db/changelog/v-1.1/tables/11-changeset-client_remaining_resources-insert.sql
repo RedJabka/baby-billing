@@ -1,0 +1,8 @@
+--liquibase formatted sql
+--changeset Andrey Butusov:11
+-- insert into client_remaining_resources
+--     (client_id, resource_id, remaining_resource_amount)
+-- values
+--     (1, 1, 100),
+--     (2, 1, 100);
+--rollback delete from client_remaining_resources
