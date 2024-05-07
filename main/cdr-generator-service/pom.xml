@@ -26,11 +26,11 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>io.projectreactor.kafka</groupId>
 			<artifactId>reactor-kafka</artifactId>
 			<version>${reactor-kafka.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.postgresql</groupId>

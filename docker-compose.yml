@@ -77,6 +77,24 @@ services:
     networks:
       - brt
 
+  postgres-hrs:
+    container_name: postgres-hrs
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_DB: baby_billing_hrs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    networks:
+      - hrs
+
   cdr-generator-service:
     container_name: cdr-generator-service
     build: ./main/cdr-generator-service
@@ -104,7 +122,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       EUREKA_HOST: eureka-server
-      # eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
       KAFKA_HOST: broker
     ports:
       - "8082:8082"
@@ -115,9 +132,39 @@ services:
         condition: service_healthy
       broker:
         condition: service_started
+      hrs-service:
+        condition: service_healthy
     networks:
       - net
       - brt
+
+  hrs-service:
+    container_name: hrs-service
+    build: ./main/hrs-service
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-hrs:5432/baby_billing_hrs?useSSL=false
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      EUREKA_HOST: eureka-server
+      KAFKA_HOST: broker
+    healthcheck:
+      test: curl --fail http://localhost:8083/health
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    ports:
+      - "8083:8083"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres-hrs:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    networks:
+      - net
+      - hrs
 
 networks:
   net:
@@ -125,4 +172,6 @@ networks:
   cdr:
     driver: bridge
   brt:
+    driver: bridge
+  hrs:
     driver: bridge
