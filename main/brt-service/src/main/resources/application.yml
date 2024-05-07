@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: brt-service
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/baby_billing_brt?useSSL=false}
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+    listener:
+      ack-mode: record
+    consumer:
+      group-id: ${spring.application.name}
+      autoOffsetReset: earliest
+      keyDeserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      valueDeserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+    properties:
+      spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+      spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.ByteArrayDeserializer
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic    
+
+kafka:
+  topics:
+    cdr: cdr-topic
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
