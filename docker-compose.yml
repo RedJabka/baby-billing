@@ -166,6 +166,19 @@ services:
       - net
       - hrs
 
+  gateway:
+    container_name: gateway
+    build: ./main/gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      broker:
+        condition: service_started
+    networks:
+      - net
+
 networks:
   net:
     driver: bridge
