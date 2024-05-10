@@ -3,6 +3,7 @@ package com.nexign.cdr.service.serviceImpl;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -25,13 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for managing CDR (Call Detail Records) operations.
- * It contains information about a phone call like a
- * phone number, start and end time of the call, type of call (incoming or
- * outcoming)
- * 
- */
 @Service
 public class CDRServiceImpl implements CDRService {
 
@@ -59,8 +53,8 @@ public class CDRServiceImpl implements CDRService {
 
     private final AtomicLong leftBound = new AtomicLong(0L);
 
-    private final int maxCallDelta = 60 * 60 * 24;
-    private final int maxCallTime = 60 * 60 * 24;
+    private final int maxCallDelta = 60 * 60 * 24 * 7;
+    private final int maxCallTime = 60 * 5;
 
     private final int recordsInFile = 10;
 
@@ -79,7 +73,8 @@ public class CDRServiceImpl implements CDRService {
     @Override
     public void generateCDR() {
         try {
-            Files.deleteIfExists(Paths.get("./CDRFiles/"));
+            deleteFolder(Paths.get("./CDRFiles/"));
+            cdrRepositoryDB.deleteAll();
             System.out.println("Directory deleted successfully.");
         } catch (IOException e) {
             System.out.println("Failed to delete the directory.");
@@ -173,5 +168,17 @@ public class CDRServiceImpl implements CDRService {
         cdrRepositoryDB.saveAll(queueList);
         byte[] fileData = Files.readAllBytes(file.toPath());
         kafkaTemplate.send(KAFKA_TOPIC, fileData);
+    }
+
+    public static void deleteFolder(Path folder) throws IOException {
+        Files.walk(folder)
+             .sorted((a, b) -> b.compareTo(a))
+             .forEach(path -> {
+                 try {
+                     Files.delete(path);
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                 }
+             });
     }
 }
