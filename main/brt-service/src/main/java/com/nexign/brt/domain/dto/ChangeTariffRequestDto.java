@@ -1,7 +1,5 @@
 package com.nexign.brt.domain.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BalanceDto {
-    
+public class ChangeTariffRequestDto {
     private String msisdn;
-    private BigDecimal money;
+    private Long tariffId;
 }

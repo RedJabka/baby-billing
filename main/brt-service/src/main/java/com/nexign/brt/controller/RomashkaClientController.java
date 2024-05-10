@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nexign.brt.domain.StatusMessage;
 import com.nexign.brt.domain.dto.BalanceDto;
-import com.nexign.brt.domain.dto.StatusDto;
+import com.nexign.brt.domain.dto.ChangeTariffRequestDto;
+import com.nexign.brt.domain.dto.NewAbonentRequestDto;
 import com.nexign.brt.service.RomashkaClientService;
 
 @RestController
@@ -25,9 +28,9 @@ public class RomashkaClientController {
         this.romashkaClientService = romashkaClientService;
     }
     
-    @PostMapping("/clients/client/login")
-    public StatusDto getClientByMsisdn(@RequestBody String msisdn) {
-        return romashkaClientService.loginClient(msisdn);
+    @GetMapping("/clients/clientExists")
+    public StatusMessage checkClientByMsisdn(@RequestParam("msisdn") String msisdn) {
+        return romashkaClientService.checkClientByMsisdn(msisdn);
     }
 
     @PutMapping("/clients/client/balance")
@@ -36,7 +39,17 @@ public class RomashkaClientController {
     }
 
     @GetMapping("/clients/client?tarriffId={tariffId}")
-    public List<Long> getClientsByTariff(@PathVariable("tariffId") String tariffId) {
+    public List<Long> getClientsByTariff(@PathVariable("tariffId") Long tariffId) {
         return romashkaClientService.findClientsByTariff(tariffId);
+    }
+
+    @PutMapping("/clients/client/tariff")
+    public StatusMessage changeTariff(@RequestBody ChangeTariffRequestDto changeTariffRequestDto) {
+        return romashkaClientService.changeTariff(changeTariffRequestDto);
+    }
+
+    @PostMapping("/clients/client")
+    public StatusMessage saveClient(@RequestBody NewAbonentRequestDto newAbonentRequestDto) {
+        return romashkaClientService.saveClient(newAbonentRequestDto);
     }
 }

@@ -8,11 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class BalanceDto {
-    
+public class NewAbonentRequestDto {
     private String msisdn;
+    private Long tariffId;
     private BigDecimal money;
 }

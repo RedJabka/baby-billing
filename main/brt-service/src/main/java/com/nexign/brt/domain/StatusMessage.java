@@ -1,4 +1,4 @@
-package com.nexign.brt.domain.dto;
+package com.nexign.brt.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StatusDto {
+public class StatusMessage {
     private int status;
     private String message;
 }

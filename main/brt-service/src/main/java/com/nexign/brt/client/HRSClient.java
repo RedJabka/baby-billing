@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nexign.brt.domain.ClientTariffToHRS;
 import com.nexign.brt.domain.CostFromHRS;
+import com.nexign.brt.domain.StatusMessage;
 import com.nexign.brt.domain.TransactionForHRS;
-import com.nexign.brt.domain.dto.StatusDto;
 
 @FeignClient(name = "hrs-service")
 public interface HRSClient {
@@ -23,5 +24,11 @@ public interface HRSClient {
     CostFromHRS calculateCost(@RequestBody TransactionForHRS transactionForHRS);
 
     @PutMapping("/clients/tariffs")
-    StatusDto updateClientsTariffs(@RequestBody List<ClientTariffToHRS> clientTariffToHRS);
+    StatusMessage updateClientsTariffs(@RequestBody List<ClientTariffToHRS> clientTariffToHRS);
+
+    @PostMapping("/calculateCostForMonthlyTariff")
+    public List<CostFromHRS> calculateCostForMonthlyTariff();
+
+    @GetMapping("/clients/tariffExists")
+    public StatusMessage tariffExists(@RequestParam("tariffId") Long tariffId);
 }
