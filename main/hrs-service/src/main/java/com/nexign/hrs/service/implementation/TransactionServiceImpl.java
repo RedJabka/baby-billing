@@ -34,8 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
             TariffRepository tariffRepository,
             BillingClientRepository billingClientRepository,
             CallRateRepository callRateRepository,
-            ClientRemainingResourceRepository clientRemainingResourceRepository
-    ) {
+            ClientRemainingResourceRepository clientRemainingResourceRepository) {
         this.tariffRepository = tariffRepository;
         this.billingClientRepository = billingClientRepository;
         this.callRateRepository = callRateRepository;
@@ -47,46 +46,47 @@ public class TransactionServiceImpl implements TransactionService {
         Tariff tariff = tariffRepository.findById(transaction.getTariffId()).orElseThrow();
         boolean checkForMonthlyTariff = tariff.getBillingMethod().equals("monthly");
 
-        CostFromHRS cost = CostFromHRS.builder()
-            .clientId(transaction.getClientId())
-            .cost(BigDecimal.valueOf(0))
-            .build();
+        BigDecimal cost = BigDecimal.valueOf(0);
 
         BigDecimal durationMinutes = BigDecimal.valueOf(
-            Math.ceil(
-                (transaction.getEndTime().toEpochSecond(ZoneOffset.UTC) - 
-                    transaction.getStartTime().toEpochSecond(ZoneOffset.UTC)) / 60.0
-            ));
+                Math.ceil(
+                        (transaction.getEndTime().toEpochSecond(ZoneOffset.UTC) -
+                                transaction.getStartTime().toEpochSecond(ZoneOffset.UTC)) / 60.0));
 
         BillingClient client = billingClientRepository.findById(transaction.getClientId()).orElseThrow();
         if (checkForMonthlyTariff) {
             client.getClientRemainingResources().stream()
-                .forEach(resource -> {
-                    if (resource.getRemainingResourceAmount().compareTo(durationMinutes) >= 0) {
-                        resource.setRemainingResourceAmount(resource.getRemainingResourceAmount().subtract(durationMinutes));
-                    }
-                    else {
-                        BigDecimal remainingDurationMinutes = durationMinutes.subtract(resource.getRemainingResourceAmount());
-                        resource.setRemainingResourceAmount(BigDecimal.valueOf(0));
-                        Tariff classicTariff = tariffRepository.findByTariffName("Classic");
+                    .forEach(resource -> {
+                        if (resource.getRemainingResourceAmount().compareTo(durationMinutes) >= 0) {
+                            resource.setRemainingResourceAmount(
+                                    resource.getRemainingResourceAmount().subtract(durationMinutes));
+                        } else {
+                            BigDecimal remainingDurationMinutes = durationMinutes
+                                    .subtract(resource.getRemainingResourceAmount());
+                            resource.setRemainingResourceAmount(BigDecimal.valueOf(0));
+                            Tariff classicTariff = tariffRepository.findByTariffName("Classic");
 
-                        cost.setCost(cost.getCost().add(calculatePerMinuteCost(remainingDurationMinutes, classicTariff, transaction)));
-                    }
-                    clientRemainingResourceRepository.save(resource);
-                });
+                            cost.add(calculateCostForPerMinute(remainingDurationMinutes, classicTariff, transaction));
+                        }
+                        clientRemainingResourceRepository.save(resource);
+                    });
         } else {
-            cost.setCost(cost.getCost().add(calculatePerMinuteCost(durationMinutes, tariff, transaction)));
+            cost.add(calculateCostForPerMinute(durationMinutes, tariff, transaction));
         }
 
-        return cost;
+        return CostFromHRS.builder()
+                .clientId(transaction.getClientId())
+                .cost(cost)
+                .build();
     }
 
-    private BigDecimal calculatePerMinuteCost(BigDecimal durationMinutes, Tariff tariff, TransactionForHRS transaction) {
+    private BigDecimal calculateCostForPerMinute(BigDecimal durationMinutes, Tariff tariff,
+            TransactionForHRS transaction) {
         BigDecimal ratePerMinute = callRateRepository.findByTariffIdAndCallTypeAndWithinTheNetworkCheck(
-                                tariff.getId(), 
-                                transaction.getCallType(),
-                                transaction.getSubscriberConnectedCheck())
-                            .getRatePerMinute();
+                tariff.getId(),
+                transaction.getCallType(),
+                transaction.getSubscriberConnectedCheck())
+                .getRatePerMinute();
         return durationMinutes.multiply(ratePerMinute);
     }
 
@@ -96,19 +96,19 @@ public class TransactionServiceImpl implements TransactionService {
         List<BillingClient> billingClients = billingClientRepository.findAllWhereBillingMethodLike("monthly");
         for (BillingClient client : billingClients) {
             CostFromHRS cost = CostFromHRS.builder()
-                .clientId(client.getId())
-                .cost(client.getTariff().getMonthlyCost())
-                .build();
+                    .clientId(client.getId())
+                    .cost(client.getTariff().getMonthlyCost())
+                    .build();
             costs.add(cost);
 
             client.getClientRemainingResources().stream()
-                .forEach(resource -> resource.setRemainingResourceAmount(resource.getResource().getIncludedAmount()));
+                    .forEach(resource -> resource
+                            .setRemainingResourceAmount(resource.getResource().getIncludedAmount()));
 
             billingClientRepository.save(client);
         }
 
         return costs;
     }
-    
 
 }

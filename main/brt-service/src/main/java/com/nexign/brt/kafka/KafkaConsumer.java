@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.nexign.brt.service.CDRHandlerService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class KafkaConsumer {
 
@@ -20,7 +23,7 @@ public class KafkaConsumer {
     public void getCDR(String CDRFile) {
         try {
             cdrHandlerService.handleCDR(CDRFile);
-            System.out.println("File was processed");
+            log.info("File was processed");
         } catch (Exception e) {
             e.printStackTrace();
         }

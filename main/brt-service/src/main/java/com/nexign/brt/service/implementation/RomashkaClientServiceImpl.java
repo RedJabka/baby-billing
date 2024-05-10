@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.nexign.brt.client.HRSClient;
 import com.nexign.brt.domain.ClientTariffToHRS;
+import com.nexign.brt.domain.CostFromHRS;
 import com.nexign.brt.domain.StatusMessage;
 import com.nexign.brt.domain.dto.BalanceDto;
 import com.nexign.brt.domain.dto.ChangeTariffRequestDto;
@@ -122,19 +123,23 @@ public class RomashkaClientServiceImpl implements RomashkaClientService {
 
     @Override
     public StatusMessage changeTariff(ChangeTariffRequestDto changeTariffRequestDto) {
-        RomashkaClient romashkaClient = romashkaClientRepository.findByMsisdn(changeTariffRequestDto.getMsisdn());
+        RomashkaClient romashkaClient = romashkaClientRepository
+                .findByMsisdn(changeTariffRequestDto.getMsisdn());
         if (romashkaClient == null) {
             return StatusMessage.builder()
                     .status(HttpStatus.NOT_FOUND.value())
                     .message("Client not found")
                     .build();
         }
-        romashkaClient.setTariffId(changeTariffRequestDto.getTariffId());
-        romashkaClientRepository.save(romashkaClient);
-        hrsClient.updateClientsTariffs(List.of(ClientTariffToHRS.builder()
+        CostFromHRS costFromHRS = hrsClient.changeTariff(ClientTariffToHRS.builder()
                 .clientId(romashkaClient.getId())
                 .tariffId(romashkaClient.getTariffId())
-                .build()));
+                .build());
+        if (costFromHRS.getCost().compareTo(BigDecimal.ZERO) != 0) {
+            romashkaClient.setBalance(romashkaClient.getBalance().subtract(costFromHRS.getCost()));
+        }
+        romashkaClient.setTariffId(changeTariffRequestDto.getTariffId());
+        romashkaClientRepository.save(romashkaClient);
         return StatusMessage.builder()
                 .status(HttpStatus.OK.value())
                 .message("Tariff changed. Abonent Id: " + romashkaClient.getId())

@@ -46,9 +46,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/changeTariff").hasAnyRole("MANAGER")
-                                .requestMatchers("/save").hasAnyRole("MANAGER")
-                                .requestMatchers("/pay").hasAnyRole("ABONENT")
+                                .requestMatchers("/manager/**").hasAnyRole("MANAGER")
+                                .requestMatchers("/abonent/**").hasAnyRole("ABONENT")
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers(
                                     "/v3/api-docs/**", 

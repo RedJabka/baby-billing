@@ -15,13 +15,15 @@ import com.nexign.brt.client.HRSClient;
 import com.nexign.brt.component.Month;
 import com.nexign.brt.domain.ClientTariffToHRS;
 import com.nexign.brt.domain.CostFromHRS;
-import com.nexign.brt.domain.StatusMessage;
 import com.nexign.brt.domain.TransactionForHRS;
 import com.nexign.brt.domain.entity.RomashkaClient;
 import com.nexign.brt.domain.enums.CallType;
 import com.nexign.brt.repository.RomashkaClientRepository;
 import com.nexign.brt.service.CDRHandlerService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class CDRHandlerServiceImpl implements CDRHandlerService {
 
@@ -48,7 +50,8 @@ public class CDRHandlerServiceImpl implements CDRHandlerService {
             if (starTime.getMonthValue() != month.getMonth()) {
                 calculateMonthlyTariffs();
                 setRandomTariffsAndBalance();
-                month.setMonth(starTime.getDayOfMonth());
+                month.setMonth(starTime.getMonthValue());
+                log.info("New month!");
             }
 
             String msisdn = record[1].strip();
@@ -117,7 +120,6 @@ public class CDRHandlerServiceImpl implements CDRHandlerService {
                         .tariffId(client.getTariffId())
                         .build())
                 .toList();
-        StatusMessage statusDto = hrsClient.updateClientsTariffs(allClientsTariffs);
-        System.out.println(statusDto.getStatus());
+        hrsClient.updateClientsTariffs(allClientsTariffs);
     }
 }

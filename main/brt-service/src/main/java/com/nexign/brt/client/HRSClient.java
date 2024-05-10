@@ -31,4 +31,7 @@ public interface HRSClient {
 
     @GetMapping("/clients/tariffExists")
     public StatusMessage tariffExists(@RequestParam("tariffId") Long tariffId);
+
+    @PutMapping("/clients/changeTariffAndCalculateCost")
+    public CostFromHRS changeTariff(@RequestBody ClientTariffToHRS clientTariff);
 }
