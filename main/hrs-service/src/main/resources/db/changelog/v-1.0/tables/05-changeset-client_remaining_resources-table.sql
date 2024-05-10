@@ -9,7 +9,7 @@ create table
                 primary key (remaining_resources_id)
 );
 alter table client_remaining_resources
-    add constraint fk_client_id foreign key (client_id) references monthly_billing_clients(client_id);
+    add constraint fk_client_id foreign key (client_id) references billing_clients(client_id);
 alter table client_remaining_resources
     add constraint fk_resource_id foreign key (resource_id) references included_resources(resource_id);
 --rollback alter table client_remaining_resources drop constraint fk_client_id;

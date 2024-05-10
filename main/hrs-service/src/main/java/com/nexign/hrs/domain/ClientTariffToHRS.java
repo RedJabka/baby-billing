@@ -1,4 +1,4 @@
-package com.nexign.hrs.domain.dto;
+package com.nexign.hrs.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StatusDto {
-    private int status;
-    private String message;
+public class ClientTariffToHRS {
+    
+    private Long clientId;
+    private Long tariffId;
 }
