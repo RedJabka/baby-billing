@@ -149,10 +149,10 @@ services:
       KAFKA_HOST: broker
     healthcheck:
       test: curl --fail http://localhost:8083/health
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
+      start_period: 40s
     ports:
       - "8083:8083"
     depends_on:
@@ -169,6 +169,8 @@ services:
   gateway:
     container_name: gateway
     build: ./main/gateway
+    environment:
+      EUREKA_HOST: eureka-server
     ports:
       - "8080:8080"
     depends_on:
