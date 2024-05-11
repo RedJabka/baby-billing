@@ -40,9 +40,11 @@ docker-compose -f docker-compose.prod.yml up -d
 - [Описание и схемы работы](https://docs.google.com/document/d/1y5WzJZcpKMCYVbWdlhkGHp-PvMB6De8SrtQ2FCxkeio/edit#heading=h.xwdzw0l1f221).
 
 - [Swagger](http://localhost:8080/swagger-ui/index.html)
+  
   Для входа менеджеру:
    - логин: admin 
    - пароль: admin
+  
   Для входа абоненту, например:
    - логин: +79000000010
    - пароль пустой
