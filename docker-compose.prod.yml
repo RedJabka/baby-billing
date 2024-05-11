@@ -33,9 +33,8 @@ services:
 
   eureka-server:
     container_name: eureka-server
-    build: ./main/eureka-server
     hostname: eureka-server
-    image: endrey/baby-billing-eureka-server
+    image: endrey/baby-billing-eureka-server:latest
     ports:
       - "8761:8761"
     networks:
@@ -98,8 +97,7 @@ services:
 
   cdr-generator-service:
     container_name: cdr-generator-service
-    build: ./main/cdr-generator-service
-    image: endrey/baby-billing-cdr-generator-service
+    image: endrey/baby-billing-cdr-generator-service:latest
     environment:
       POSTGRES_URL: jdbc:postgresql://postgres-cdr:5432/baby_billing_cdr?useSSL=false
       POSTGRES_USER: admin
@@ -118,8 +116,7 @@ services:
 
   brt-service:
     container_name: brt-service
-    build: ./main/brt-service
-    image: endrey/baby-billing-brt-service
+    image: endrey/baby-billing-brt-service:latest
     environment:
       POSTGRES_URL: jdbc:postgresql://postgres-brt:5432/baby_billing_brt?useSSL=false
       POSTGRES_USER: admin
@@ -143,8 +140,7 @@ services:
 
   hrs-service:
     container_name: hrs-service
-    build: ./main/hrs-service
-    image: endrey/baby-billing-hrs-service
+    image: endrey/baby-billing-hrs-service:latest
     environment:
       POSTGRES_URL: jdbc:postgresql://postgres-hrs:5432/baby_billing_hrs?useSSL=false
       POSTGRES_USER: admin
@@ -172,8 +168,7 @@ services:
 
   gateway:
     container_name: gateway
-    build: ./main/gateway
-    image: endrey/baby-billing-gateway
+    image: endrey/baby-billing-gateway:latest
     environment:
       EUREKA_HOST: eureka-server
     ports:
