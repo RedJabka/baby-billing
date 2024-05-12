@@ -54,10 +54,10 @@ public class GlobalExceptionHandler {
                 log.error(e.getMessage(), e);
                 return new ResponseEntity<>(
                                 StatusMessage.builder()
-                                                .status(HttpStatus.BAD_REQUEST.value())
-                                                .message(e.contentUTF8())
+                                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                                .message(e.getLocalizedMessage())
                                                 .build(),
-                                HttpStatus.BAD_REQUEST);
+                                HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 }

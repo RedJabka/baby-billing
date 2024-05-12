@@ -119,7 +119,7 @@ public class RomashkaClientServiceImpl implements RomashkaClientService {
 
         CostFromHRS costFromHRS = hrsClient.changeTariff(ClientTariffToHRS.builder()
                 .clientId(romashkaClient.getId())
-                .tariffId(romashkaClient.getTariffId())
+                .tariffId(changeTariffRequestDto.getTariffId())
                 .build());
         if (costFromHRS.getCost().compareTo(BigDecimal.ZERO) != 0) {
             romashkaClient.setBalance(romashkaClient.getBalance().subtract(costFromHRS.getCost()));

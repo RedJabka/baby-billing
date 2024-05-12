@@ -43,12 +43,20 @@ public class BillingClientServiceImpl implements BillingClientService {
 
     @Override
     public CostFromHRS changeTariffAndCalculateCost(ClientTariffToHRS clientTariff) {
-        Tariff oldTariff = tariffRepository.getReferenceById(clientTariff.getTariffId());
+        Tariff oldTariff = billingClientRepository.getReferenceById(clientTariff.getClientId()).getTariff();
+        if (oldTariff.getId().equals(clientTariff.getTariffId())) {
+            return CostFromHRS.builder()
+                    .clientId(clientTariff.getClientId())
+                    .cost(BigDecimal.valueOf(0))
+                    .build();
+        }
         BigDecimal cost = BigDecimal.valueOf(0);
         if (oldTariff.getBillingMethod().equals("monthly")) {
-            cost.add(oldTariff.getMonthlyCost());
+            cost = oldTariff.getMonthlyCost();
         }
+        
         changeTariff(clientTariff);
+
         return CostFromHRS.builder()
                 .clientId(clientTariff.getClientId())
                 .cost(cost)
