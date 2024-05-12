@@ -1,0 +1,11 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <include file="tables/07-changeset-tariffs-insert.sql" relativeToChangelogFile="true" />
+    <include file="tables/08-changeset-billing_clients-insert.sql" relativeToChangelogFile="true" />
+    <include file="tables/09-changeset-included_resources-insert.sql" relativeToChangelogFile="true" />
+    <include file="tables/10-changeset-call_rates-insert.sql" relativeToChangelogFile="true" />
+    <include file="tables/11-changeset-client_remaining_resources-insert.sql" relativeToChangelogFile="true" />
+
+</databaseChangeLog>

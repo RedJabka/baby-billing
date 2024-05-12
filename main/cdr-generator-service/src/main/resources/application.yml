@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: cdr-generator-service
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/baby_billing_cdr?useSSL=false}
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+kafka:
+  topics:
+    cdr: cdr-topic
+
+server:
+  port: 8081

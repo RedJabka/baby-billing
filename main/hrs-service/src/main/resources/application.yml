@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: hrs-service
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/baby_billing_hrs?useSSL=false&useUnicode=yes&characterEncoding=UTF8}
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+
+# logging:
+#   level:
+#     org.hibernate.orm.jdbc.bind: TRACE
+#     org.hibernate.type: TRACE
+#     org.hibernate.type.descriptor.sql: TRACE
+#     org.hibernate.stat: DEBUG

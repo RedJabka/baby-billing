@@ -1,0 +1,193 @@
+version: '3.9'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - net
+  
+  broker:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: broker
+    hostname: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - net
+
+  eureka-server:
+    container_name: eureka-server
+    hostname: eureka-server
+    image: endrey/baby-billing-eureka-server:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - net
+
+  postgres-cdr:
+    container_name: postgres-cdr
+    hostname: postgres-cdr
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_DB: baby_billing_cdr
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5434:5432"
+    networks:
+      - cdr
+
+  postgres-brt:
+    container_name: postgres-brt
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_DB: baby_billing_brt
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    networks:
+      - brt
+
+  postgres-hrs:
+    container_name: postgres-hrs
+    image: postgres
+    healthcheck:
+          test: [ "CMD", "pg_isready","-d","postgres","-U","postgres" ]
+          interval: 5s
+          timeout: 1s
+          retries: 5
+          start_period: 5s
+    environment:
+      POSTGRES_DB: baby_billing_hrs
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5435:5432"
+    networks:
+      - hrs
+
+  cdr-generator-service:
+    container_name: cdr-generator-service
+    image: endrey/baby-billing-cdr-generator-service:latest
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-cdr:5432/baby_billing_cdr?useSSL=false
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      KAFKA_HOST: broker
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres-cdr:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    networks:
+      - net
+      - cdr
+
+  brt-service:
+    container_name: brt-service
+    image: endrey/baby-billing-brt-service:latest
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-brt:5432/baby_billing_brt?useSSL=false
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      EUREKA_HOST: eureka-server
+      KAFKA_HOST: broker
+    ports:
+      - "8082:8082"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres-brt:
+        condition: service_healthy
+      broker:
+        condition: service_started
+      hrs-service:
+        condition: service_healthy
+    networks:
+      - net
+      - brt
+
+  hrs-service:
+    container_name: hrs-service
+    image: endrey/baby-billing-hrs-service:latest
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-hrs:5432/baby_billing_hrs?useSSL=false
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      EUREKA_HOST: eureka-server
+      KAFKA_HOST: broker
+    healthcheck:
+      test: curl --fail http://localhost:8083/health
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    ports:
+      - "8083:8083"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      postgres-hrs:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    networks:
+      - net
+      - hrs
+
+  gateway:
+    container_name: gateway
+    image: endrey/baby-billing-gateway:latest
+    environment:
+      EUREKA_HOST: eureka-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_started
+      broker:
+        condition: service_started
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
+  cdr:
+    driver: bridge
+  brt:
+    driver: bridge
+  hrs:
+    driver: bridge
