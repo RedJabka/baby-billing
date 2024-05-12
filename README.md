@@ -39,6 +39,8 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## Ссылки
 
+- [Презентация](https://docs.google.com/presentation/d/1JDAMButGdhOddntR-gk3Lp8oG1QH8wtAppYIHtdBuk0/edit?usp=sharing)
+
 - [Описание и схемы работы](https://docs.google.com/document/d/1y5WzJZcpKMCYVbWdlhkGHp-PvMB6De8SrtQ2FCxkeio/edit#heading=h.xwdzw0l1f221).
 
 - [Swagger](http://localhost:8080/swagger-ui/index.html)
