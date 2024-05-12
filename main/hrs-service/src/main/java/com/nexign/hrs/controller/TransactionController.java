@@ -11,6 +11,9 @@ import com.nexign.hrs.domain.CostFromHRS;
 import com.nexign.hrs.domain.TransactionForHRS;
 import com.nexign.hrs.service.TransactionService;
 
+/**
+ * Controller for calculate cost for transaction
+ */
 @RestController
 public class TransactionController {
 

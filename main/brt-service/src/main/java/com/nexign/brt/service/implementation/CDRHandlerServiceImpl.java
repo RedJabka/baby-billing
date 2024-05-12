@@ -23,6 +23,9 @@ import com.nexign.brt.service.CDRHandlerService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Class for handling CDR files
+ */
 @Slf4j
 @Service
 public class CDRHandlerServiceImpl implements CDRHandlerService {

@@ -21,6 +21,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+/**
+ * Controller for methods that can do role abonent
+ */
 @RestController
 @OpenAPIDefinition(info = @Info(title = "Baby Billing API", version = "v1"))
 @Tag(name = "Abonent", description = "Operations that can do abonent")

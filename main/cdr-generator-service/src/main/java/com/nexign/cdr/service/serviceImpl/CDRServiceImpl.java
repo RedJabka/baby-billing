@@ -21,28 +21,31 @@ import com.nexign.cdr.repository.SubscriberRepository;
 import com.nexign.cdr.repository.CDRRepositoryFile;
 import com.nexign.cdr.repository.CDRRepositoryDB;
 import com.nexign.cdr.service.CDRService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of {@link CDRService} that generate CDRs, 
+ * saves them in DB and in files and sends them to Kafka
+ */
+@Slf4j
 @Service
 public class CDRServiceImpl implements CDRService {
 
     private final CDRRepositoryDB cdrRepositoryDB;
-
     private final CDRRepositoryFile cdrRepositoryFile;
-
     private final SubscriberRepository subscriberRepository;
-
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
-
     @Value("${kafka.topics.cdr}")
     private final String KAFKA_TOPIC;
 
-    private final int numTreads = 10;
-
-    private final ExecutorService executorService = Executors.newFixedThreadPool(numTreads);
+    private final int NUM_THREADS = 10;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
 
     private final Random random = new Random();
 
@@ -50,13 +53,12 @@ public class CDRServiceImpl implements CDRService {
     private final LocalDateTime currentYear = LocalDateTime.of(year, 1, 1, 0, 0);
 
     private final long rightBound = Year.isLeap(year) ? 60 * 60 * 24 * 366L : 60 * 60 * 24 * 365L;
-
     private final AtomicLong leftBound = new AtomicLong(0L);
 
-    private final int maxCallDelta = 60 * 60 * 24 * 7;
-    private final int maxCallTime = 60 * 5;
+    private final int MAX_CALL_DELAY = 60 * 60 * 24 * 7;
+    private final int MAX_CALL_TIME = 60 * 5;
 
-    private final int recordsInFile = 10;
+    private final int RECORDS_IN_FILE = 10;
 
     @Autowired
     public CDRServiceImpl(CDRRepositoryDB cdrRepositoryDB,
@@ -75,27 +77,27 @@ public class CDRServiceImpl implements CDRService {
         try {
             deleteFolder(Paths.get("./CDRFiles/"));
             cdrRepositoryDB.deleteAll();
-            System.out.println("Directory deleted successfully.");
+            log.info("Directory deleted successfully.");
         } catch (IOException e) {
-            System.out.println("Failed to delete the directory.");
+            log.info("Failed to delete the directory.");
             e.printStackTrace();
         }
 
         List<Subscriber> subscribers = subscriberRepository.findAll();
         int subscribersSize = subscribers.size();
 
-        BlockingQueue<CDR> queue = new PriorityBlockingQueue<>(recordsInFile, Comparator.comparing(CDR::getStartTime));
+        BlockingQueue<CDR> queue = new PriorityBlockingQueue<>(RECORDS_IN_FILE, Comparator.comparing(CDR::getStartTime));
 
         if (subscribersSize == 0) {
             throw new IllegalArgumentException("There are no subscribers in the system");
         }
 
-        System.out.println("Generating CDR...");
+        log.info("Generating CDR...");
 
-        for (int index = 0; index < numTreads; index++) {
+        for (int index = 0; index < NUM_THREADS; index++) {
             executorService.submit(() -> {
                 while (leftBound.get() < rightBound) {
-                    long currentLeftBound = leftBound.getAndAdd(random.nextInt(maxCallDelta));
+                    long currentLeftBound = leftBound.getAndAdd(random.nextInt(MAX_CALL_DELAY));
 
                     int firstSubscriberId = random.nextInt(subscribersSize);
                     int secondSubscriberId;
@@ -107,7 +109,7 @@ public class CDRServiceImpl implements CDRService {
                     Subscriber secondSubscriber = subscribers.get(secondSubscriberId);
 
                     LocalDateTime startTime = currentYear.plusSeconds(currentLeftBound);
-                    LocalDateTime endTime = startTime.plusSeconds(random.nextInt(maxCallTime));
+                    LocalDateTime endTime = startTime.plusSeconds(random.nextInt(MAX_CALL_TIME));
 
                     CDR cdr1 = CDR.builder()
                             .callType(CallType.getByCode("01"))
@@ -130,7 +132,7 @@ public class CDRServiceImpl implements CDRService {
                         queue.put(cdr2);
 
                         synchronized (queue) {
-                            if (queue.size() >= recordsInFile) {
+                            if (queue.size() >= RECORDS_IN_FILE) {
                                 saveCDR(queue);
                             }
                         }
@@ -158,12 +160,12 @@ public class CDRServiceImpl implements CDRService {
             }
         }
 
-        System.out.println("CDR generation finished");
+        log.info("CDR generation finished");
     }
 
     public void saveCDR(BlockingQueue<CDR> queue) throws IOException {
-        List<CDR> queueList = new ArrayList<>(recordsInFile);
-        queue.drainTo(queueList, recordsInFile);
+        List<CDR> queueList = new ArrayList<>(RECORDS_IN_FILE);
+        queue.drainTo(queueList, RECORDS_IN_FILE);
         File file = cdrRepositoryFile.saveToFile(queueList);
         cdrRepositoryDB.saveAll(queueList);
         byte[] fileData = Files.readAllBytes(file.toPath());

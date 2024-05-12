@@ -8,6 +8,9 @@ import com.nexign.brt.service.CDRHandlerService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Class for consuming CDR files from Kafka
+ */
 @Slf4j
 @Service
 public class KafkaConsumer {

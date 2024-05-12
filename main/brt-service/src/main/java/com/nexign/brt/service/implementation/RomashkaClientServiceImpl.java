@@ -20,6 +20,9 @@ import com.nexign.brt.service.RomashkaClientService;
 
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * Class for working with Romashka clients for controller
+ */
 @Service
 public class RomashkaClientServiceImpl implements RomashkaClientService {
 

@@ -14,6 +14,9 @@ import com.nexign.gateway.domain.dto.ChangeBalanceRequestToBrtDto;
 import com.nexign.gateway.domain.dto.ChangeTariffRequestDto;
 import com.nexign.gateway.domain.dto.NewAbonentRequestToBrtDto;
 
+/**
+ * Feign client for communication with BRT
+ */
 @FeignClient(name = "brt-service")
 public interface BRTClient {
     

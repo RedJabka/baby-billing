@@ -12,6 +12,9 @@ import com.nexign.gateway.domain.dto.NewAbonentRequestDto;
 import com.nexign.gateway.domain.dto.NewAbonentRequestToBrtDto;
 import com.nexign.gateway.service.ManagerService;
 
+/**
+ * Service for methods that can do role manager
+ */
 @Service
 public class ManagerServiceImpl implements ManagerService {
 

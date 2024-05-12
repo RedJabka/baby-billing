@@ -14,6 +14,9 @@ import com.nexign.hrs.domain.CostFromHRS;
 import com.nexign.hrs.domain.dto.StatusMessage;
 import com.nexign.hrs.service.BillingClientService;
 
+/**
+ * Controller for working with clients and there tariffs
+ */
 @RestController
 public class BillingClientController {
 

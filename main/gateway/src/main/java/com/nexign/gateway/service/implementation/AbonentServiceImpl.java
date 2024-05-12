@@ -14,6 +14,9 @@ import com.nexign.gateway.domain.dto.PayRequestDto;
 import com.nexign.gateway.exceptionHandler.exception.NegativePayMoneyException;
 import com.nexign.gateway.service.AbonentService;
 
+/**
+ * Service for methods that can do role abonent
+ */
 @Service
 public class AbonentServiceImpl implements AbonentService {
 

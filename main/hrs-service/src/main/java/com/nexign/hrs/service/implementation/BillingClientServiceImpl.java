@@ -18,6 +18,10 @@ import com.nexign.hrs.repository.ClientRemainingResourceRepository;
 import com.nexign.hrs.repository.TariffRepository;
 import com.nexign.hrs.service.BillingClientService;
 
+/**
+ * Implementation of {@link BillingClientService}. 
+ * Service for working with clients and there tariffs
+ */
 @Service
 public class BillingClientServiceImpl implements BillingClientService {
 

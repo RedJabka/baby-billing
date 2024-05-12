@@ -16,6 +16,10 @@ import com.nexign.brt.domain.dto.ChangeTariffRequestDto;
 import com.nexign.brt.domain.dto.NewAbonentRequestDto;
 import com.nexign.brt.service.RomashkaClientService;
 
+/**
+ * Controller that allows to work with Romashka clients
+ * for Gateway API
+ */
 @RestController
 public class RomashkaClientController {
 

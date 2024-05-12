@@ -2,6 +2,9 @@ package com.nexign.brt.component;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Class for storing current month
+ */
 @Component
 public class Month {
 

@@ -9,6 +9,10 @@ import com.nexign.brt.service.CDRHandlerService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Component to make connection with HRS before starting app 
+ * and then syncronize abonents and tariffs
+ */
 @Slf4j
 @Component
 public class ServiceInitializer {

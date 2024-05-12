@@ -18,6 +18,10 @@ import com.nexign.hrs.repository.BillingClientRepository;
 import com.nexign.hrs.repository.TariffRepository;
 import com.nexign.hrs.service.TransactionService;
 
+/**
+ * Implementation of {@link TransactionService}.
+ * Service for calculate cost for transactions
+ */
 @Service
 public class TransactionServiceImpl implements TransactionService {
 

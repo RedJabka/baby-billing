@@ -14,6 +14,9 @@ import com.nexign.brt.domain.CostFromHRS;
 import com.nexign.brt.domain.StatusMessage;
 import com.nexign.brt.domain.TransactionForHRS;
 
+/**
+ * Feign client for communication with HRS
+ */
 @FeignClient(name = "hrs-service")
 public interface HRSClient {
     

@@ -14,15 +14,12 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 
+/**
+ * Implementation of {@link CDRRepositoryFile} that work with files
+ */
 @Repository
 public class CDRRepositoryFileImpl implements CDRRepositoryFile {
 
-    /**
-     * This method saves the list of CDR entities to file in txt format.
-     * It saves one file per month.
-     * @param cdrList the list of CDR entities to save
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     public File saveToFile(List<CDR> cdrList) throws IOException {
         String fileName = getFileName();
