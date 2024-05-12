@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.nexign.gateway.domain.StatusMessage;
 import com.nexign.gateway.domain.dto.ChangeBalanceRequestToBrtDto;
 import com.nexign.gateway.domain.dto.ChangeTariffRequestDto;
-import com.nexign.gateway.domain.dto.NewAbonentRequestDto;
+import com.nexign.gateway.domain.dto.NewAbonentRequestToBrtDto;
 
 @FeignClient(name = "brt-service")
 public interface BRTClient {
@@ -24,7 +24,7 @@ public interface BRTClient {
     StatusMessage changeTariff(@RequestBody ChangeTariffRequestDto changeTariffRequestDto);
 
     @PostMapping("/clients/client")
-    public StatusMessage saveClient(@RequestBody NewAbonentRequestDto newAbonentRequestDto);
+    public StatusMessage saveClient(@RequestBody NewAbonentRequestToBrtDto newAbonentRequestDto);
 
     @PutMapping("/clients/client/balance")
     public BigDecimal changeBalance(@RequestBody ChangeBalanceRequestToBrtDto changeBalanceRequestToBrtDto);

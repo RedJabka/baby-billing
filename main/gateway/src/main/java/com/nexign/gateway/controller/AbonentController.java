@@ -39,6 +39,8 @@ public class AbonentController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = StatusMessage.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = {
+                    @Content(schema = @Schema(implementation = StatusMessage.class)) }),
             @ApiResponse(responseCode = "401", content = {
                     @Content(schema = @Schema(implementation = StatusMessage.class)) }),
             @ApiResponse(responseCode = "403", content = {

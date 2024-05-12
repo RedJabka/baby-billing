@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.nexign.brt.domain.StatusMessage;
 
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 
 @ControllerAdvice
@@ -17,21 +18,32 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StatusMessage> catchEntityNotFoundException(EntityNotFoundException e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(
-            StatusMessage.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .message(e.getLocalizedMessage())
-                .build(),
-            HttpStatus.NOT_FOUND);
+                StatusMessage.builder()
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .message(e.getLocalizedMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<StatusMessage> catchException(Exception e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(
-            StatusMessage.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getLocalizedMessage())
-                .build(),
-            HttpStatus.BAD_REQUEST);
+                StatusMessage.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(e.getLocalizedMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<StatusMessage> catchFeignException(FeignException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(
+                StatusMessage.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(e.contentUTF8())
+                        .build(),
+                HttpStatus.BAD_REQUEST);
     }
 }

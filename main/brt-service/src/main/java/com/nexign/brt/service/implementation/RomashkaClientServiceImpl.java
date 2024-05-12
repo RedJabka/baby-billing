@@ -2,7 +2,6 @@ package com.nexign.brt.service.implementation;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,23 +50,6 @@ public class RomashkaClientServiceImpl implements RomashkaClientService {
 
     }
 
-    @Override
-    public List<ClientTariffToHRS> getAllClientsTariffs() {
-        return romashkaClientRepository.findAll()
-                .stream()
-                .map(client -> ClientTariffToHRS.builder()
-                        .clientId(client.getId())
-                        .tariffId(client.getTariffId())
-                        .build())
-                .toList();
-    }
-
-    @Override
-    public RomashkaClient findClientByMsisdn(String msisdn) {
-        return Optional.of(romashkaClientRepository.findByMsisdn(msisdn))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Client not found"));
-    }
 
     @Override
     public StatusMessage saveClient(NewAbonentRequestDto newAbonentRequestDto) {
@@ -115,13 +97,6 @@ public class RomashkaClientServiceImpl implements RomashkaClientService {
     }
 
     @Override
-    public List<Long> findClientsByTariff(Long tariffId) {
-        return romashkaClientRepository.findByTariffId(tariffId).stream()
-                .map(RomashkaClient::getId)
-                .toList();
-    }
-
-    @Override
     public StatusMessage changeTariff(ChangeTariffRequestDto changeTariffRequestDto) {
         RomashkaClient romashkaClient = romashkaClientRepository
                 .findByMsisdn(changeTariffRequestDto.getMsisdn());
@@ -131,6 +106,14 @@ public class RomashkaClientServiceImpl implements RomashkaClientService {
                     .message("Client not found")
                     .build();
         }
+
+        if (hrsClient.tariffExists(changeTariffRequestDto.getTariffId()).getStatus() != HttpStatus.OK.value()) {
+            return StatusMessage.builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("Tariff not found")
+                    .build();
+        }
+
         CostFromHRS costFromHRS = hrsClient.changeTariff(ClientTariffToHRS.builder()
                 .clientId(romashkaClient.getId())
                 .tariffId(romashkaClient.getTariffId())

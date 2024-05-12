@@ -34,4 +34,7 @@ public interface HRSClient {
 
     @PutMapping("/clients/changeTariffAndCalculateCost")
     public CostFromHRS changeTariff(@RequestBody ClientTariffToHRS clientTariff);
+
+    @GetMapping("/health")
+    public String health();
 }
