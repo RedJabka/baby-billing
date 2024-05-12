@@ -102,7 +102,7 @@ cd ./gateway
 java -jar .\target\gateway-0.0.1.jar
 ```
 
-Потом лушче убедиться, что работает hrs сервис и только после этого запустить brt-service:
+Потом лучше убедиться, что работает hrs сервис и только после этого запустить brt-service:
 ```cmd
 cd ./brt-service
 java -jar .\target\brt-service-0.0.1.jar
