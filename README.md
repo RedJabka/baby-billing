@@ -45,6 +45,8 @@ docker-compose -f docker-compose.prod.yml up -d
 
 - [Swagger](http://localhost:8080/swagger-ui/index.html)
 
+- [Swagger gile](./resources/swagger.json)
+
 - [Тест-план](https://docs.google.com/document/d/10_4xf1Bk2PrUTof9l3HXOfeX7tGJ-P8MTxtWmvgV_e0/edit?usp=sharing)
 
 - [Отчет по тестированию](https://docs.google.com/document/d/1cuTb9BIMtL9SvBQ4PKpHP1oQkwaLvPYPQPUyZ5Chs1w/edit?usp=sharing)
