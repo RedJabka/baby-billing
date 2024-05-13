@@ -1,0 +1,386 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "Baby Billing API",
+      "version": "v1"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8080",
+        "description": "Generated server url"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Manager",
+        "description": "Operations that can do manager"
+      },
+      {
+        "name": "Abonent",
+        "description": "Operations that can do abonent"
+      },
+      {
+        "name": "Authentication",
+        "description": "Login method"
+      }
+    ],
+    "paths": {
+      "/manager/changeTariff": {
+        "put": {
+          "tags": [
+            "Manager"
+          ],
+          "summary": "Manager change tariff for abonent",
+          "description": "In this method manager can change tariff for abonent",
+          "operationId": "changeTariff",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeTariffRequestDto"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not Found",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "basicAuth": [
+                
+              ]
+            }
+          ]
+        }
+      },
+      "/abonent/pay": {
+        "put": {
+          "tags": [
+            "Abonent"
+          ],
+          "summary": "Abonent pays his balance to the account",
+          "description": "With this method, the subscriber tops up his balance on the phone number by specifying how much money should be topped up",
+          "operationId": "pay",
+          "parameters": [
+            {
+              "name": "payRequestDto",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/PayRequestDto"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "basicAuth": [
+                
+              ]
+            }
+          ]
+        }
+      },
+      "/manager/save": {
+        "post": {
+          "tags": [
+            "Manager"
+          ],
+          "summary": "Manager save new abonent",
+          "description": "In this method manager can save new abonent",
+          "operationId": "saveNewAbonent",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewAbonentRequestDto"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not Found",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "Conflict",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "basicAuth": [
+                
+              ]
+            }
+          ]
+        }
+      },
+      "/login": {
+        "post": {
+          "tags": [
+            "Authentication"
+          ],
+          "summary": "Login method",
+          "description": "Checks if user exists and password is correct",
+          "operationId": "login",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequestDto"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "ChangeTariffRequestDto": {
+          "type": "object",
+          "properties": {
+            "msisdn": {
+              "type": "string"
+            },
+            "tariffId": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "StatusMessage": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        },
+        "PayRequestDto": {
+          "type": "object",
+          "properties": {
+            "money": {
+              "type": "number"
+            }
+          }
+        },
+        "NewAbonentRequestDto": {
+          "type": "object",
+          "properties": {
+            "msisdn": {
+              "type": "string"
+            },
+            "tariffId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "money": {
+              "type": "number"
+            }
+          }
+        },
+        "LoginRequestDto": {
+          "type": "object",
+          "properties": {
+            "login": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "securitySchemes": {
+        "basicAuth": {
+          "type": "http",
+          "scheme": "basic"
+        }
+      }
+    }
+  }
