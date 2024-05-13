@@ -25,7 +25,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## Структура проекта
 
-![architecture](./images/architecture.jpg)
+![architecture](./resources/architecture.jpg)
 
 Была разработана микросервисная архитектура с такими модулями:
 - [CDR service](./main/cdr-generator-service) - сервис генерирующий cdr файлы. Они создаются:
